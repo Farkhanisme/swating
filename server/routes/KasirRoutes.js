@@ -1,12 +1,6 @@
 import e from "express";
-import {
-  checkout,
-  getBarang,
-  getPengeluaran,
-  getPenjualan,
-  getTotal,
-  insertPengeluaran,
-} from "../controllers/kasirController.js";
+import { checkout, getBarang, getPengeluaran, getPenjualan, getTotal, insertPengeluaran } from "../controllers/ControllerKasir.js";
+
 
 const router = e.Router();
 
