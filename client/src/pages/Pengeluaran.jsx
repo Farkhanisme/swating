@@ -91,8 +91,6 @@ const Pengeluaran = () => {
         setDataPengeluaran(response.data);
       } catch (error) {
         toast.error("Gagal mengambil data");
-      } finally {
-        setIsLoading(false);
       }
     };
     getPengeluaran();
