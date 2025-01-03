@@ -146,7 +146,7 @@ const PenjualanAdmin = () => {
           </thead>
           <tbody>
             {setor.map((setor, index) => (
-              <tr>
+              <tr key={index}>
                 <td className="text-center border border-x-0">
                   {formatRupiah(setor.totalSetor)}
                 </td>
