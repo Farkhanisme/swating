@@ -111,7 +111,7 @@ const PenjualanAdmin = () => {
                     {formatRupiah(allTotal.totalSetor)}
                   </td>
                   <td className="text-center border border-x-0">
-                    {formatRupiah(allTotal.totalTerjual - allTotal.totalSetor)}
+                    {allTotal.totalTerjual - allTotal.totalSetor}
                   </td>
                 </tr>
               ))}
