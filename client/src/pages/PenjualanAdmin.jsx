@@ -59,8 +59,6 @@ const PenjualanAdmin = () => {
     getSetor();
   }, []);
 
-  console.log(allTotal);
-
   return (
     <>
       <div className="flex flex-col-reverse md:flex-row mb-5">
