@@ -98,26 +98,21 @@ export const getPengeluaran = async (req, res) => {
 };
 
 export const checkout = async (req, res) => {
-  // Query untuk memasukkan data
   const insertBarang =
-    "INSERT INTO penjualan (barangId, jumlahTerjual, totalHarga, tanggal) VALUES (?, ?, ?, CURDATE())";
+    "INSERT INTO penjualan (barangId, jumlahTerjual, totalHarga,totalSetor , tanggal) VALUES (?, ?, ?, ?, DATE_ADD(CURDATE(), INTERVAL 1 DAY))";
 
   try {
-    // Iterasi pada setiap item di array `req.body.data`
     for (const item of req.body.data) {
-      const { barangId, jumlahTerjual, totalHarga } = item;
+      const { barangId, jumlahTerjual, totalHarga, totalSetor } = item;
 
-      // Pastikan semua data valid
       if (!barangId || !jumlahTerjual || !totalHarga) {
         console.error("Data tidak valid:", item);
-        continue; // Skip item yang tidak valid
+        continue;
       }
 
-      // Eksekusi query untuk setiap item
-      await query(insertBarang, [barangId, jumlahTerjual, totalHarga]);
+      await query(insertBarang, [barangId, jumlahTerjual, totalHarga, totalSetor]);
     }
 
-    // Berikan respon sukses
     res.status(201).json({
       message: "Semua barang berhasil ditambahkan",
     });

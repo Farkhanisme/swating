@@ -395,7 +395,7 @@ const TambahBarang = () => {
           Data Barang
         </h1>
         <div className="md:p-0 p-5">
-          <table className="w-full bg-zinc-100">
+          <table className="table-auto w-full bg-zinc-100">
             <thead>
               <tr>
                 <th>No.</th>
@@ -414,7 +414,7 @@ const TambahBarang = () => {
                   <td>{barang.namaBarang}</td>
                   <td>{barang.kategoriBarang}</td>
                   <td>{barang.kodeProduk}</td>
-                  <td>{barang.hargaJual}</td>
+                  <td>{formatRupiah(barang.hargaJual)}</td>
                   <td>{barang.stock}</td>
                   <td>{barang.namaPenitip}</td>
                 </tr>

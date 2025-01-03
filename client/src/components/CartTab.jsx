@@ -78,6 +78,7 @@ const CartTab = () => {
               barangId: product.id,
               jumlahTerjual: cartItem.quantity,
               totalHarga: product.hargaJual * cartItem.quantity,
+              totalSetor: product.hargaAwal * cartItem.quantity,
             };
           }
           return null;

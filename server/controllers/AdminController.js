@@ -102,7 +102,48 @@ export const getPenjualan = async (req, res) => {
 };
 
 export const getTotal = async (req, res) => {
-  const select = `SELECT tanggal, SUM(totalHarga) AS totalTerjual FROM penjualan GROUP BY tanggal ORDER BY tanggal DESC;`;
+  const select = `SELECT tanggal, SUM(totalHarga) AS totalTerjual FROM penjualan GROUP BY tanggal ORDER BY tanggal DESC`;
+  try {
+    const result = await query(select);
+    res.json(result);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return res.status(500).json({
+      error: "Gagal mengambil data",
+      details: error.message,
+    });
+  }
+};
+
+export const getAllTotal = async (req, res) => {
+  const select = `SELECT SUM(totalHarga) AS totalTerjual, SUM(totalSetor) AS totalSetor FROM penjualan`;
+  try {
+    const result = await query(select);
+    res.json(result);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return res.status(500).json({
+      error: "Gagal mengambil data",
+      details: error.message,
+    });
+  }
+};
+
+export const getSetor = async (req, res) => {
+  const select = `SELECT 
+    barang.penitipId, 
+    penitip.nama,
+    SUM(penjualan.totalHarga) AS totalTerjual, 
+    SUM(penjualan.totalSetor) AS totalSetor
+FROM 
+    penjualan
+JOIN 
+    barang ON penjualan.barangId = barang.id
+LEFT JOIN
+    penitip ON barang.penitipId = penitip.id
+GROUP BY 
+    barang.penitipId;
+`;
   try {
     const result = await query(select);
     res.json(result);
@@ -117,18 +158,18 @@ export const getTotal = async (req, res) => {
 
 export const checkout = async (req, res) => {
   const insertBarang =
-    "INSERT INTO penjualan (barangId, jumlahTerjual, totalHarga, tanggal) VALUES (?, ?, ?, DATE_ADD(CURDATE(), INTERVAL 1 DAY))";
+    "INSERT INTO penjualan (barangId, jumlahTerjual, totalHarga,totalSetor , tanggal) VALUES (?, ?, ?, ?, DATE_ADD(CURDATE(), INTERVAL 1 DAY))";
 
   try {
     for (const item of req.body.data) {
-      const { barangId, jumlahTerjual, totalHarga } = item;
+      const { barangId, jumlahTerjual, totalHarga, totalSetor } = item;
 
       if (!barangId || !jumlahTerjual || !totalHarga) {
         console.error("Data tidak valid:", item);
         continue;
       }
 
-      await query(insertBarang, [barangId, jumlahTerjual, totalHarga]);
+      await query(insertBarang, [barangId, jumlahTerjual, totalHarga, totalSetor]);
     }
 
     res.status(201).json({
