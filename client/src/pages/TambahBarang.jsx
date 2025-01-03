@@ -207,16 +207,16 @@ const TambahBarang = () => {
   }, [isLoading]);
 
   return (
-    <div className="flex flex-row space-x-5">
+    <div className="flex md:flex-row flex-col space-x-5">
       {/* <Toaster /> */}
-      <div className="flex w-1/2">
-        <div className="w-1/2 pb-5">
+      <div className="flex md:w-1/2 w-full md:flex-row flex-col">
+        <div className="md:w-1/2 w-full pb-5">
           <h1 className="text-2xl text-center mb-5 top-0 py-4 bg-white">
             Tambah Barang
           </h1>
           <form
             onSubmit={handleBarangSubmit}
-            className="space-y-5 border-r border-black p-5"
+            className="space-y-5 md:border-r border-black p-5"
           >
             <div className="flex space-y-2 items-start flex-col">
               <label>Nama Barang:</label>
@@ -307,13 +307,13 @@ const TambahBarang = () => {
             </button>
           </form>
         </div>
-        <div className="w-1/2">
+        <div className="md:w-1/2 w-full">
           <h1 className="text-2xl text-center mb-5 top-0 py-4 bg-white">
             Tambah Penitip
           </h1>
           <form
             onSubmit={handlePenitipSubmit}
-            className="space-y-5 border-r border-black p-5"
+            className="space-y-5 md:border-r border-black p-5"
           >
             <div className="flex space-y-2 items-start flex-col">
               <label>Nama Penitip:</label>
@@ -381,7 +381,7 @@ const TambahBarang = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col w-1/2 pr-5">
+      <div className="flex flex-col md:w-1/2 w-full md:pr-5 pr-10 md:mt-0 mt-5">
         <h1 className="text-2xl text-center mb-5 w-full top-0 py-4 bg-white">
           Data Barang
         </h1>
