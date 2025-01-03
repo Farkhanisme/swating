@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-import { convertRupiahToNumber, formatRupiah, hurufKapital } from "../functions/util";
+import {
+  convertRupiahToNumber,
+  formatRupiah,
+  hurufKapital,
+} from "../functions/util";
 
 const TambahBarang = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -179,7 +183,9 @@ const TambahBarang = () => {
   useEffect(() => {
     const getPenitip = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/admin/get-penitip`);
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/admin/get-penitip`
+        );
         setPenitip(response.data);
       } catch (error) {
         toast.error("Gagal mengambil data");
@@ -191,9 +197,12 @@ const TambahBarang = () => {
     const getBarang = async () => {
       const kategori = "";
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/admin/get-barang`, {
-          params: { kategori },
-        });
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/admin/get-barang`,
+          {
+            params: { kategori },
+          }
+        );
         setBarang(response.data);
       } catch (error) {
         toast.error("Gagal mengambil data");
@@ -385,32 +394,34 @@ const TambahBarang = () => {
         <h1 className="text-2xl text-center mb-5 w-full top-0 py-4 bg-white">
           Data Barang
         </h1>
-        <table className="w-full bg-zinc-100">
-          <thead>
-            <tr>
-              <th>No.</th>
-              <th>Nama</th>
-              <th>Kategori</th>
-              <th>Kode</th>
-              <th>Harga</th>
-              <th>Stok</th>
-              <th>Penitip</th>
-            </tr>
-          </thead>
-          <tbody>
-            {barang.map((barang, index) => (
-              <tr key={barang.id} className="text-center border border-x-0">
-                <td>{index + 1}</td>
-                <td>{barang.namaBarang}</td>
-                <td>{barang.kategoriBarang}</td>
-                <td>{barang.kodeProduk}</td>
-                <td>{barang.hargaJual}</td>
-                <td>{barang.stock}</td>
-                <td>{barang.namaPenitip}</td>
+        <div className="md:p-0 p-5">
+          <table className="w-full bg-zinc-100">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>Nama</th>
+                <th>Kategori</th>
+                <th>Kode</th>
+                <th>Harga</th>
+                <th>Stok</th>
+                <th>Penitip</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {barang.map((barang, index) => (
+                <tr key={barang.id} className="text-center border border-x-0">
+                  <td>{index + 1}</td>
+                  <td>{barang.namaBarang}</td>
+                  <td>{barang.kategoriBarang}</td>
+                  <td>{barang.kodeProduk}</td>
+                  <td>{barang.hargaJual}</td>
+                  <td>{barang.stock}</td>
+                  <td>{barang.namaPenitip}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
