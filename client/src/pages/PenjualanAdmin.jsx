@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import moment from "moment";
-import { formatRupiah } from "../functions/util";
+import { } from "../functions/util";
 
 const PenjualanAdmin = () => {
   const [penjualan, setPenjualan] = useState([]);
@@ -15,7 +15,7 @@ const PenjualanAdmin = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_API_URL}/admin/get-penjualan`
         );
-        setPenjualan(response.data);
+        // setPenjualan(response.data);
       } catch (error) {
         alert("Gagal mengambil data");
       }
@@ -27,7 +27,7 @@ const PenjualanAdmin = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_API_URL}/admin/get-total`
         );
-        setTotal(response.data);
+        // setTotal(response.data);
       } catch (error) {
         alert("Gagal mengambil data");
       }
@@ -39,7 +39,7 @@ const PenjualanAdmin = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_API_URL}/admin/get-all-total`
         );
-        setAllTotal(response.data);
+        // setAllTotal(response.data);
       } catch (error) {
         alert("Gagal mengambil data");
       }
@@ -51,7 +51,7 @@ const PenjualanAdmin = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_API_URL}/admin/get-setor`
         );
-        setSetor(response.data);
+        // setSetor(response.data);
       } catch (error) {
         alert("Gagal mengambil data");
       }
@@ -84,7 +84,7 @@ const PenjualanAdmin = () => {
                 <td>{penjualan.namaBarang}</td>
                 <td>{penjualan.totalTerjual}</td>
                 <td>{penjualan.stock - penjualan.totalTerjual}</td>
-                <td>{formatRupiah(penjualan.totalHarga)}</td>
+                <td>{penjualan.totalHarga}</td>
                 <td>{penjualan.nama}</td>
               </tr>
             ))}
@@ -105,10 +105,10 @@ const PenjualanAdmin = () => {
               {allTotal.map((allTotal, index) => (
                 <tr key={index}>
                   <td className="text-center border border-x-0">
-                    {formatRupiah(allTotal.totalTerjual)}
+                    {allTotal.totalTerjual}
                   </td>
                   <td className="text-center border border-x-0">
-                    {formatRupiah(allTotal.totalSetor)}
+                    {allTotal.totalSetor}
                   </td>
                   <td className="text-center border border-x-0">
                     {allTotal.totalTerjual - allTotal.totalSetor}
@@ -131,7 +131,7 @@ const PenjualanAdmin = () => {
                 <tr key={index} className="text-center border border-x-0">
                   <td>{index + 1}</td>
                   <td>{moment(total.tanggal).format("DDD MMMM, YYYY")}</td>
-                  <td>{formatRupiah(total.totalTerjual)}</td>
+                  <td>{total.totalTerjual}</td>
                 </tr>
               ))}
             </tbody>
@@ -148,7 +148,7 @@ const PenjualanAdmin = () => {
             {setor.map((setor, index) => (
               <tr key={index}>
                 <td className="text-center border border-x-0">
-                  {formatRupiah(setor.totalSetor)}
+                  {setor.totalSetor}
                 </td>
                 <td className="text-center border border-x-0">{setor.nama}</td>
               </tr>
