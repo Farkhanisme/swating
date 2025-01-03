@@ -394,6 +394,7 @@ const TambahBarang = () => {
               <input
                 name="hargaJual"
                 type="text"
+                inputMode="numeric"
                 value={formatRupiah(dataBarang.hargaJual)}
                 onChange={handleBarangChange}
                 className="w-full border-2 border-black rounded-md p-1 placeholder-gray-500 text-sm"
@@ -404,6 +405,7 @@ const TambahBarang = () => {
               <label>Stock:</label>
               <input
                 name="stock"
+                type="text"
                 inputMode="numeric"
                 value={dataBarang.stock}
                 onChange={handleBarangChange}
@@ -570,6 +572,7 @@ const TambahBarang = () => {
                       {editingId === item.id ? (
                         <input
                           type="text"
+                          inputMode="numeric"
                           name="hargaAwal"
                           value={formatRupiah(editData.hargaAwal)}
                           onChange={handleEditChange}
@@ -583,6 +586,7 @@ const TambahBarang = () => {
                       {editingId === item.id ? (
                         <input
                           type="text"
+                          inputMode="numeric"
                           name="hargaJual"
                           value={formatRupiah(editData.hargaJual)}
                           onChange={handleEditChange}
@@ -595,7 +599,8 @@ const TambahBarang = () => {
                     <td>
                       {editingId === item.id ? (
                         <input
-                          type="number"
+                          type="text"
+                          inputMode="numeric"
                           name="stock"
                           value={editData.stock}
                           onChange={handleEditChange}
