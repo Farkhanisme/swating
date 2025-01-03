@@ -207,7 +207,7 @@ const TambahBarang = () => {
   }, [isLoading]);
 
   return (
-    <div className="flex md:flex-row flex-col space-x-5">
+    <div className="flex md:flex-row flex-col md:space-x-5">
       {/* <Toaster /> */}
       <div className="flex md:w-1/2 w-full md:flex-row flex-col">
         <div className="md:w-1/2 w-full pb-5">
@@ -381,7 +381,7 @@ const TambahBarang = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col md:w-1/2 w-full md:pr-5 pr-10 md:mt-0 mt-5">
+      <div className="flex flex-col md:w-1/2 w-full md:pr-5 md:mt-0 mt-5">
         <h1 className="text-2xl text-center mb-5 w-full top-0 py-4 bg-white">
           Data Barang
         </h1>
