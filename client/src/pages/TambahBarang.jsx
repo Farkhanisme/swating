@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import {
   convertRupiahToNumber,
   formatRupiah,
@@ -11,6 +11,16 @@ const TambahBarang = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [penitip, setPenitip] = useState([]);
   const [barang, setBarang] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+  const [editData, setEditData] = useState({
+    namaBarang: "",
+    kategoriBarang: "",
+    kodeProduk: "",
+    hargaAwal: "",
+    hargaJual: "",
+    stock: "",
+    penitipId: "",
+  });
 
   const [dataBarang, setDataBarang] = useState({
     namaBarang: "",
@@ -215,9 +225,112 @@ const TambahBarang = () => {
     getBarang();
   }, [isLoading]);
 
+  const startEdit = (item) => {
+    setEditingId(item.id);
+    setEditData({
+      namaBarang: item.namaBarang,
+      kategoriBarang: item.kategoriBarang,
+      kodeProduk: item.kodeProduk,
+      hargaAwal: item.hargaAwal.toString(),
+      hargaJual: item.hargaJual.toString(),
+      stock: item.stock.toString(),
+      penitipId: item.penitipId,
+    });
+  };
+
+  // Fungsi untuk menyimpan perubahan
+  const saveEdit = async (id) => {
+    try {
+      const loadingToast = toast.loading("Menyimpan perubahan...");
+
+      const dataToSend = {
+        ...editData,
+        hargaAwal: convertRupiahToNumber(editData.hargaAwal),
+        hargaJual: convertRupiahToNumber(editData.hargaJual),
+        stock: parseInt(editData.stock),
+      };
+
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/admin/update-barang/${id}`,
+        dataToSend
+      );
+
+      if (response) {
+        toast.dismiss(loadingToast);
+        toast.success("Data berhasil diupdate");
+        setIsLoading(true);
+      }
+
+      setEditingId(null);
+      setEditData({
+        namaBarang: "",
+        kategoriBarang: "",
+        kodeProduk: "",
+        hargaAwal: "",
+        hargaJual: "",
+        stock: "",
+        penitipId: "",
+      });
+    } catch (error) {
+      toast.error("Gagal mengupdate data");
+      console.error("Error updating data:", error);
+    }
+  };
+
+  // Fungsi untuk membatalkan edit
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditData({
+      namaBarang: "",
+      kategoriBarang: "",
+      kodeProduk: "",
+      hargaJual: "",
+      stock: "",
+      penitipId: "",
+    });
+  };
+
+  // Handle perubahan data edit
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "hargaJual") {
+      setEditData((prev) => ({
+        ...prev,
+        [name]: value.replace(/\D/g, ""),
+      }));
+    } else {
+      setEditData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Apakah Anda yakin ingin menghapus barang ini?")) {
+      return;
+    }
+
+    try {
+      const loadingToast = toast.loading("Menghapus barang...");
+
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/admin/delete-barang/${id}`
+      );
+
+      if (response) {
+        toast.dismiss(loadingToast);
+        toast.success("Barang berhasil dihapus");
+        setIsLoading(true); // Trigger refresh data
+      }
+    } catch (error) {
+      toast.error("Gagal menghapus barang");
+      console.error("Error deleting item:", error);
+    }
+  };
+
   return (
     <div className="flex md:flex-row flex-col md:space-x-5">
-      {/* <Toaster /> */}
       <div className="flex md:w-1/2 w-full md:flex-row flex-col">
         <div className="md:w-1/2 w-full pb-5">
           <h1 className="text-2xl text-center mb-5 top-0 py-4 bg-white">
@@ -395,32 +508,160 @@ const TambahBarang = () => {
           Data Barang
         </h1>
         <div className="md:p-0 p-5">
-          <table className="table-auto w-full bg-zinc-100">
-            <thead>
-              <tr>
-                <th>No.</th>
-                <th>Nama</th>
-                <th>Kategori</th>
-                <th>Kode</th>
-                <th>Harga</th>
-                <th>Stok</th>
-                <th>Penitip</th>
-              </tr>
-            </thead>
-            <tbody>
-              {barang.map((barang, index) => (
-                <tr key={barang.id} className="text-center border border-x-0">
-                  <td>{index + 1}</td>
-                  <td>{barang.namaBarang}</td>
-                  <td>{barang.kategoriBarang}</td>
-                  <td>{barang.kodeProduk}</td>
-                  <td>{formatRupiah(barang.hargaJual)}</td>
-                  <td>{barang.stock}</td>
-                  <td>{barang.namaPenitip}</td>
+          <div className="overflow-x-auto">
+            <table className="table-auto w-full bg-zinc-100">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Nama</th>
+                  <th>Kategori</th>
+                  <th>Kode</th>
+                  <th>Harga</th>
+                  <th>Stok</th>
+                  <th>Penitip</th>
+                  <th>Aksi</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {barang.map((item, index) => (
+                  <tr key={item.id} className="text-center border border-x-0">
+                    <td>{index + 1}</td>
+                    <td>
+                      {editingId === item.id ? (
+                        <input
+                          type="text"
+                          name="namaBarang"
+                          value={editData.namaBarang}
+                          onChange={handleEditChange}
+                          className="w-fit p-1 text-center border rounded"
+                        />
+                      ) : (
+                        item.namaBarang
+                      )}
+                    </td>
+                    <td>
+                      {editingId === item.id ? (
+                        <input
+                          type="text"
+                          name="kategoriBarang"
+                          value={editData.kategoriBarang}
+                          onChange={handleEditChange}
+                          className="w-fit p-1 text-center border rounded"
+                        />
+                      ) : (
+                        item.kategoriBarang
+                      )}
+                    </td>
+                    <td>
+                      {editingId === item.id ? (
+                        <input
+                          type="text"
+                          name="kodeProduk"
+                          value={editData.kodeProduk}
+                          onChange={handleEditChange}
+                          className="w-fit p-1 text-center border rounded"
+                          readOnly
+                        />
+                      ) : (
+                        item.kodeProduk
+                      )}
+                    </td>
+                    <td>
+                      {editingId === item.id ? (
+                        <input
+                          type="text"
+                          name="hargaAwal"
+                          value={formatRupiah(editData.hargaAwal)}
+                          onChange={handleEditChange}
+                          className="w-fit p-1 text-center border rounded"
+                        />
+                      ) : (
+                        formatRupiah(item.hargaAwal)
+                      )}
+                    </td>
+                    <td>
+                      {editingId === item.id ? (
+                        <input
+                          type="text"
+                          name="hargaJual"
+                          value={formatRupiah(editData.hargaJual)}
+                          onChange={handleEditChange}
+                          className="w-fit p-1 text-center border rounded"
+                        />
+                      ) : (
+                        formatRupiah(item.hargaJual)
+                      )}
+                    </td>
+                    <td>
+                      {editingId === item.id ? (
+                        <input
+                          type="number"
+                          name="stock"
+                          value={editData.stock}
+                          onChange={handleEditChange}
+                          className="w-20 p-1 text-center border rounded"
+                          min="0"
+                        />
+                      ) : (
+                        item.stock
+                      )}
+                    </td>
+                    <td>
+                      {editingId === item.id ? (
+                        <select
+                          name="penitipId"
+                          value={editData.penitipId}
+                          onChange={handleEditChange}
+                          className="w-fit p-1 text-center border rounded"
+                        >
+                          {penitip.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.nama}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        item.namaPenitip
+                      )}
+                    </td>
+                    <td>
+                      {editingId === item.id ? (
+                        <div className="flex justify-center space-x-1">
+                          <button
+                            onClick={() => saveEdit(item.id)}
+                            className="bg-green-500 text-white px-2 py-1 rounded text-sm"
+                          >
+                            ✓
+                          </button>
+                          <button
+                            onClick={cancelEdit}
+                            className="bg-red-500 text-white px-2 py-1 rounded text-sm"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex justify-center space-x-1">
+                          <button
+                            onClick={() => startEdit(item)}
+                            className="bg-blue-500 text-white px-2 py-1 rounded text-sm"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item.id)}
+                            className="bg-red-500 text-white px-2 py-1 rounded text-sm"
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

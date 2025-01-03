@@ -47,7 +47,8 @@ export const getBarang = async (req, res) => {
         barang.hargaAwal, 
         barang.hargaJual, 
         barang.stock, 
-        penitip.nama AS namaPenitip 
+        barang.penitipId,
+        penitip.nama AS namaPenitip
     FROM 
         barang 
     LEFT JOIN 
@@ -169,7 +170,12 @@ export const checkout = async (req, res) => {
         continue;
       }
 
-      await query(insertBarang, [barangId, jumlahTerjual, totalHarga, totalSetor]);
+      await query(insertBarang, [
+        barangId,
+        jumlahTerjual,
+        totalHarga,
+        totalSetor,
+      ]);
     }
 
     res.status(201).json({
@@ -221,7 +227,8 @@ export const getPenitip = async (req, res) => {
 export const insertPengeluaran = async (req, res) => {
   const { nominal, keterangan } = req.body;
 
-  const insert = "INSERT INTO pengeluaran (nominal, keterangan, tanggal) VALUES (?, ?, CURDATE())";
+  const insert =
+    "INSERT INTO pengeluaran (nominal, keterangan, tanggal) VALUES (?, ?, CURDATE())";
 
   try {
     await query(insert, [nominal, keterangan]);
@@ -232,6 +239,63 @@ export const insertPengeluaran = async (req, res) => {
     console.error("Error saat menambahkan barang:", error.message);
     res.status(500).json({
       message: "Terjadi kesalahan saat menambahkan data",
+      error: error.message,
+    });
+  }
+};
+
+export const updateBarang = async (req, res) => {
+  const { id } = req.params;
+  const {
+    namaBarang,
+    kategoriBarang,
+    penitipId,
+    hargaAwal,
+    hargaJual,
+    stock,
+    kodeProduk,
+  } = req.body;
+
+  const updateBarang =
+    "UPDATE barang SET namaBarang = ?, kategoriBarang = ?, kodeProduk = ?, hargaAwal = ?, hargaJual = ?, stock = ?, penitipId = ?, updated_at = CURDATE() WHERE id = ?";
+  try {
+    const result = await query(updateBarang, [
+      namaBarang,
+      kategoriBarang,
+      kodeProduk,
+      hargaAwal,
+      hargaJual,
+      stock,
+      penitipId,
+      id,
+    ]);
+
+    res.status(201).json({
+      message: "Barang berhasil ditambahkan",
+    });
+  } catch (error) {
+    console.error("Error saat menambahkan barang:", error.message);
+    res.status(500).json({
+      message: "Terjadi kesalahan saat menambahkan barang",
+      error: error.message,
+    });
+  }
+};
+
+export const deleteBarang = async (req, res) => {
+  const { id } = req.params;
+
+  const deleteBarang = "DELETE FROM barang WHERE id = ?";
+  try {
+    const result = await query(deleteBarang, [id]);
+
+    res.status(201).json({
+      message: "Barang berhasil dihapus",
+    });
+  } catch (error) {
+    console.error("Error saat menghapus barang:", error.message);
+    res.status(500).json({
+      message: "Terjadi kesalahan saat menghapus barang",
       error: error.message,
     });
   }
