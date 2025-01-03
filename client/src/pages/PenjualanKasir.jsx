@@ -36,8 +36,6 @@ const PenjualanKasir = () => {
     getTotal();
   }, []);
 
-  console.log(total);
-
   const totalHarga = penjualan.reduce((acc, curr) => acc + curr.totalHarga, 0);
 
   return (
