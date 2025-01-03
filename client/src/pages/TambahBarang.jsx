@@ -518,7 +518,8 @@ const TambahBarang = () => {
                   <th>Nama</th>
                   <th>Kategori</th>
                   <th>Kode</th>
-                  <th>Harga</th>
+                  <th>Harga Awal</th>
+                  <th>Harga Jual</th>
                   <th>Stok</th>
                   <th>Penitip</th>
                   <th>Aksi</th>
