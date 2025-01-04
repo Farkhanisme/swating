@@ -85,8 +85,6 @@ const CartTab = () => {
         })
         .filter(Boolean);
 
-      console.log("Checkout Data:", checkoutDetails);
-
       await axios.post(`${import.meta.env.VITE_API_URL}/checkout`, {
         data: checkoutDetails,
       });

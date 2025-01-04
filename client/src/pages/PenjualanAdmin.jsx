@@ -1,7 +1,9 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import moment from "moment";
-import { } from "../functions/util";
+import { formatRupiah } from "../functions/util";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const PenjualanAdmin = () => {
   const [penjualan, setPenjualan] = useState([]);
@@ -15,7 +17,7 @@ const PenjualanAdmin = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_API_URL}/admin/get-penjualan`
         );
-        // setPenjualan(response.data);
+        setPenjualan(response.data);
       } catch (error) {
         alert("Gagal mengambil data");
       }
@@ -27,7 +29,7 @@ const PenjualanAdmin = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_API_URL}/admin/get-total`
         );
-        // setTotal(response.data);
+        setTotal(response.data);
       } catch (error) {
         alert("Gagal mengambil data");
       }
@@ -39,7 +41,7 @@ const PenjualanAdmin = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_API_URL}/admin/get-all-total`
         );
-        // setAllTotal(response.data);
+        setAllTotal(response.data);
       } catch (error) {
         alert("Gagal mengambil data");
       }
@@ -51,7 +53,7 @@ const PenjualanAdmin = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_API_URL}/admin/get-setor`
         );
-        // setSetor(response.data);
+        setSetor(response.data);
       } catch (error) {
         alert("Gagal mengambil data");
       }
@@ -59,8 +61,41 @@ const PenjualanAdmin = () => {
     getSetor();
   }, []);
 
+  const handleGeneratePDF = () => {
+    try {
+      const pdf = new jsPDF();
+
+      // Tambahkan Judul
+      pdf.text("Laporan Penjualan", 14, 10);
+
+      // Tambahkan Tabel Penjualan
+      pdf.autoTable({
+        startY: 20,
+        head: [["No.", "Tanggal", "Nama Barang", "Qty", "Harga"]],
+        body: penjualan.map((item, index) => [
+          index + 1,
+          moment(item.tanggal).format("DD MMMM YYYY"),
+          item.namaBarang,
+          item.totalTerjual,
+          formatRupiah(item.totalHarga),
+        ]),
+      });
+
+      // Simpan PDF
+      pdf.save("laporan_penjualan.pdf");
+
+      alert("PDF berhasil diunduh!");
+    } catch (error) {
+      console.error("Error saat membuat PDF:", error);
+      alert("Terjadi kesalahan saat membuat PDF.");
+    }
+  };
+
   return (
     <>
+      <button className="md:w-fit w-full p-2 bg-green-500 rounded-md text-white mb-5" onClick={handleGeneratePDF}>
+        Generate PDF dan Kirim ke WhatsApp
+      </button>
       <div className="flex flex-col-reverse md:flex-row mb-5">
         <table className="w-full bg-zinc-100 text-center">
           <thead>
@@ -76,7 +111,7 @@ const PenjualanAdmin = () => {
           </thead>
           <tbody>
             {penjualan.map((penjualan, index) => (
-              <tr key={penjualan.id} className="text-center border border-x-0">
+              <tr key={index} className="text-center border border-x-0">
                 <td>{index + 1}</td>
                 <td>
                   {moment(penjualan.tanggal).local().format("DDD MMMM, YYYY")}
@@ -84,7 +119,7 @@ const PenjualanAdmin = () => {
                 <td>{penjualan.namaBarang}</td>
                 <td>{penjualan.totalTerjual}</td>
                 <td>{penjualan.stock - penjualan.totalTerjual}</td>
-                <td>{penjualan.totalHarga}</td>
+                <td>{formatRupiah(penjualan.totalHarga)}</td>
                 <td>{penjualan.nama}</td>
               </tr>
             ))}
@@ -105,13 +140,13 @@ const PenjualanAdmin = () => {
               {allTotal.map((allTotal, index) => (
                 <tr key={index}>
                   <td className="text-center border border-x-0">
-                    {allTotal.totalTerjual}
+                    {formatRupiah(allTotal.totalTerjual)}
                   </td>
                   <td className="text-center border border-x-0">
-                    {allTotal.totalSetor}
+                    {formatRupiah(allTotal.totalSetor)}
                   </td>
                   <td className="text-center border border-x-0">
-                    {allTotal.totalTerjual - allTotal.totalSetor}
+                    {formatRupiah(allTotal.totalTerjual - allTotal.totalSetor)}
                   </td>
                 </tr>
               ))}
@@ -131,7 +166,7 @@ const PenjualanAdmin = () => {
                 <tr key={index} className="text-center border border-x-0">
                   <td>{index + 1}</td>
                   <td>{moment(total.tanggal).format("DDD MMMM, YYYY")}</td>
-                  <td>{total.totalTerjual}</td>
+                  <td>{formatRupiah(total.totalTerjual)}</td>
                 </tr>
               ))}
             </tbody>
@@ -148,7 +183,7 @@ const PenjualanAdmin = () => {
             {setor.map((setor, index) => (
               <tr key={index}>
                 <td className="text-center border border-x-0">
-                  {setor.totalSetor}
+                  {formatRupiah(setor.totalSetor)}
                 </td>
                 <td className="text-center border border-x-0">{setor.nama}</td>
               </tr>

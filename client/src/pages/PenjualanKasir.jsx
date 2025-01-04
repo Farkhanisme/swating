@@ -54,7 +54,7 @@ const PenjualanKasir = () => {
         </thead>
         <tbody>
           {penjualan.map((penjualan, index) => (
-            <tr key={penjualan.id} className="text-center border border-x-0">
+            <tr key={index} className="text-center border border-x-0">
               <td>{index + 1}</td>
               <td>
                 {moment(penjualan.tanggal).local().format("DDD MMMM, YYYY")}
@@ -78,7 +78,7 @@ const PenjualanKasir = () => {
         </thead>
         <tbody>
           {total.map((total, index) => (
-            <tr>
+            <tr key={index}>
               {/* <td>{index + 1}</td> */}
               <td>{moment(total.tanggal).format("DDD MMMM, YYYY")}</td>
               <td>{formatRupiah(total.totalTerjual)}</td>
