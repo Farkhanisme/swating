@@ -99,7 +99,7 @@ export const getPengeluaran = async (req, res) => {
 
 export const checkout = async (req, res) => {
   const insertBarang =
-    "INSERT INTO penjualan (barangId, jumlahTerjual, totalHarga,totalSetor , tanggal) VALUES (?, ?, ?, ?, DATE_ADD(CURDATE(), INTERVAL 1 DAY))";
+    "INSERT INTO penjualan (barangId, jumlahTerjual, totalHarga,totalSetor , tanggal) VALUES (?, ?, ?, ?, CURDATE())";
 
   try {
     for (const item of req.body.data) {
