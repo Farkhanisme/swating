@@ -93,8 +93,6 @@ const TambahBarang = () => {
     const requiredFields = [
       "namaBarang",
       "kategoriBarang",
-      "hargaAwal",
-      "stock",
     ];
     const emptyFields = requiredFields.filter((field) => !dataBarang[field]);
 
