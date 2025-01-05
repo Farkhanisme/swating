@@ -93,7 +93,10 @@ const PenjualanAdmin = () => {
 
   return (
     <>
-      <button className="md:w-fit w-full p-2 bg-green-500 rounded-md text-white mb-5" onClick={handleGeneratePDF}>
+      <button
+        className="md:w-fit w-full p-2 bg-green-500 rounded-md text-white mb-5"
+        onClick={handleGeneratePDF}
+      >
         Generate PDF dan Kirim ke WhatsApp
       </button>
       <div className="flex flex-col-reverse md:flex-row mb-5">
@@ -118,7 +121,11 @@ const PenjualanAdmin = () => {
                 </td>
                 <td>{penjualan.namaBarang}</td>
                 <td>{penjualan.totalTerjual}</td>
-                <td>{penjualan.stock - penjualan.totalTerjual}</td>
+                <td>
+                  {penjualan.stock != null
+                    ? penjualan.stock - penjualan.totalTerjual
+                    : "♾️"}
+                </td>
                 <td>{formatRupiah(penjualan.totalHarga)}</td>
                 <td>{penjualan.nama}</td>
               </tr>
