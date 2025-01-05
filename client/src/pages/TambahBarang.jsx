@@ -229,9 +229,9 @@ const TambahBarang = () => {
       namaBarang: item.namaBarang,
       kategoriBarang: item.kategoriBarang,
       kodeProduk: item.kodeProduk,
-      hargaAwal: item.hargaAwal.toString(),
+      hargaAwal: item.hargaAwal != null ? item.hargaAwal.toString() : 0,
       hargaJual: item.hargaJual.toString(),
-      stock: item.stock.toString(),
+      stock: item.stock ? item.stock.toString() : 0,
       penitipId: item.penitipId,
     });
   };
@@ -243,7 +243,7 @@ const TambahBarang = () => {
 
       const dataToSend = {
         ...editData,
-        hargaAwal: convertRupiahToNumber(editData.hargaAwal),
+        hargaAwal: editData.hargaAwal = 0 ? convertRupiahToNumber(editData.hargaAwal) : 0,
         hargaJual: convertRupiahToNumber(editData.hargaJual),
         stock: parseInt(editData.stock),
       };
@@ -578,7 +578,7 @@ const TambahBarang = () => {
                           className="w-fit p-1 text-center border rounded"
                         />
                       ) : (
-                        item.hargaAwal != null ? formatRupiah(item.hargaAwal) : '0'
+                        item.hargaAwal != null ? formatRupiah(item.hargaAwal) : 0
                       )}
                     </td>
                     <td>
@@ -607,7 +607,7 @@ const TambahBarang = () => {
                           min="0"
                         />
                       ) : (
-                        item.stock
+                        item.stock != null ? item.stock : 0
                       )}
                     </td>
                     <td>
