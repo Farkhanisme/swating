@@ -18,9 +18,9 @@ export const insertBarang = async (req, res) => {
       namaBarang,
       kategoriBarang,
       kodeProduk,
-      hargaAwal,
+      hargaAwal || null,
       hargaJual,
-      stock,
+      stock || null,
       penitipId || null,
     ]);
 
