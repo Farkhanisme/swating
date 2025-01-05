@@ -578,7 +578,7 @@ const TambahBarang = () => {
                           className="w-fit p-1 text-center border rounded"
                         />
                       ) : (
-                        formatRupiah(item.hargaAwal)
+                        item.hargaAwal != null ? formatRupiah(item.hargaAwal) : '0'
                       )}
                     </td>
                     <td>
