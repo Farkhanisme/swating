@@ -107,7 +107,7 @@ const PenjualanAdmin = () => {
   };
 
   const handleRefresh = (e) => {
-    e.prevent.default;
+    e.preventDefault();
     setIsLoading(true);
   };
 
