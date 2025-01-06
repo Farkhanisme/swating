@@ -61,7 +61,7 @@ const PenjualanKasir = () => {
               </td>
               <td>{penjualan.namaBarang}</td>
               <td>{penjualan.totalTerjual}</td>
-              <td>{penjualan.stock - penjualan.totalTerjual}</td>
+              <td>{(penjualan.stock - penjualan.totalTerjual) < 0 ? 0 : (penjualan.stock - penjualan.totalTerjual)}</td>
               <td>{formatRupiah(penjualan.totalHarga)}</td>
               <td>{penjualan.nama}</td>
             </tr>

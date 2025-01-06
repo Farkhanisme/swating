@@ -20,6 +20,9 @@ const Stock = () => {
     getPenjualan();
   }, []);
 
+  console.log(penjualan);
+  
+
   const updateStock = async (id, newStock) => {
     try {
       console.log(id, newStock);
