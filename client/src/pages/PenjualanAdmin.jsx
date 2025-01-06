@@ -63,7 +63,7 @@ const PenjualanAdmin = () => {
       }
     };
     getSetor();
-  }, []);
+  }, [isLoading]);
 
   const handleGeneratePDF = () => {
     try {
