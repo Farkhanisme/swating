@@ -102,6 +102,39 @@ export const getPenjualan = async (req, res) => {
   }
 };
 
+export const getStock = async (req, res) => {
+  const select = `
+  SELECT 
+      barang.id,
+      barang.namaBarang, 
+      penitip.nama,
+      barang.stock,
+      barang.updated_at,
+      SUM(penjualan.jumlahTerjual) AS totalTerjual,
+      SUM(penjualan.totalHarga) AS totalHarga
+  FROM 
+      penjualan 
+  JOIN 
+      barang ON penjualan.barangId = barang.id
+  LEFT JOIN 
+      penitip ON barang.penitipId = penitip.id
+  GROUP BY 
+      barang.namaBarang, penitip.nama, barang.stock, barang.updated_at, barang.id
+  ORDER BY 
+      totalTerjual DESC
+  `;
+  try {
+    const result = await query(select);
+    res.json(result);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return res.status(500).json({
+      error: "Gagal mengambil data",
+      details: error.message,
+    });
+  }
+};
+
 export const getTotal = async (req, res) => {
   const select = `SELECT tanggal, SUM(totalHarga) AS totalTerjual FROM penjualan GROUP BY tanggal ORDER BY tanggal DESC`;
   try {
@@ -153,39 +186,6 @@ GROUP BY
     return res.status(500).json({
       error: "Gagal mengambil data",
       details: error.message,
-    });
-  }
-};
-
-export const checkout = async (req, res) => {
-  const insertBarang =
-    "INSERT INTO penjualan (barangId, jumlahTerjual, totalHarga,totalSetor , tanggal) VALUES (?, ?, ?, ?, CURDATE())";
-
-  try {
-    for (const item of req.body.data) {
-      const { barangId, jumlahTerjual, totalHarga, totalSetor } = item;
-
-      if (!barangId || !jumlahTerjual || !totalHarga) {
-        console.error("Data tidak valid:", item);
-        continue;
-      }
-
-      await query(insertBarang, [
-        barangId,
-        jumlahTerjual,
-        totalHarga,
-        totalSetor,
-      ]);
-    }
-
-    res.status(201).json({
-      message: "Semua barang berhasil ditambahkan",
-    });
-  } catch (error) {
-    console.error("Error saat menambahkan barang:", error.message);
-    res.status(500).json({
-      message: "Terjadi kesalahan saat menambahkan barang",
-      error: error.message,
     });
   }
 };
@@ -300,3 +300,28 @@ export const deleteBarang = async (req, res) => {
     });
   }
 };
+
+export const updateStock = async (req, res) => {
+  const { id, stock } = req.body;
+
+  if (!id || stock == null) {
+    return res.status(400).json({ message: "ID atau stok tidak boleh kosong" });
+  }
+
+  try {
+    const result = await query(
+      "UPDATE barang SET stock = ?, updated_at = CURDATE() WHERE id = ?",
+      [stock, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Barang tidak ditemukan" });
+    }
+
+    res.status(200).json({ message: "Stok berhasil diperbarui" });
+  } catch (error) {
+    console.error("Gagal memperbarui stok:", error.message);
+    res.status(500).json({ message: "Terjadi kesalahan", error: error.message });
+  }
+};
+

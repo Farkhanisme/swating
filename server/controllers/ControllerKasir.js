@@ -1,4 +1,4 @@
-import { query } from "../database/db.js";
+import { getConnection, query } from "../database/db.js";
 
 export const getBarang = async (req, res) => {
   const { kategori } = req.query;
@@ -98,37 +98,108 @@ export const getPengeluaran = async (req, res) => {
 };
 
 export const checkout = async (req, res) => {
-  const insertBarang =
-    "INSERT INTO penjualan (barangId, jumlahTerjual, totalHarga,totalSetor , tanggal) VALUES (?, ?, ?, ?, CURDATE())";
+  const connection = await getConnection();
 
   try {
+    // Validasi input
+    if (!Array.isArray(req.body.data)) {
+      return res.status(400).json({
+        success: false,
+        message: "Format data tidak valid",
+      });
+    }
+
+    await connection.beginTransaction();
+
+    const insertPenjualan = `
+      INSERT INTO penjualan 
+        (barangId, jumlahTerjual, totalHarga, totalSetor, tanggal) 
+      VALUES 
+        (?, ?, ?, ?, CURDATE())
+    `;
+
+    const checkStock = `
+      SELECT stock, namaBarang 
+      FROM barang 
+      WHERE id = ?
+    `;
+
+    const updateStock = `
+      UPDATE barang 
+      SET stock = stock - ?, 
+          updated_at = CURDATE() 
+      WHERE id = ?
+    `;
+
     for (const item of req.body.data) {
       const { barangId, jumlahTerjual, totalHarga, totalSetor } = item;
 
-      if (!barangId || !jumlahTerjual || !totalHarga) {
-        console.error("Data tidak valid:", item);
-        continue;
+      // Validasi data item
+      if (
+        !barangId ||
+        !jumlahTerjual ||
+        !totalHarga ||
+        isNaN(jumlahTerjual) ||
+        isNaN(totalHarga) ||
+        jumlahTerjual <= 0 ||
+        totalHarga < 0
+      ) {
+        await connection.rollback();
+        return res.status(400).json({
+          success: false,
+          message: `Data tidak valid untuk barang ID: ${barangId}`,
+        });
       }
 
-      await query(insertBarang, [barangId, jumlahTerjual, totalHarga, totalSetor]);
+      // Cek stok
+      const [stockResult] = await query(checkStock, [barangId]);
+      if (!stockResult || stockResult.stock < jumlahTerjual) {
+        await connection.rollback();
+        return res.status(400).json({
+          success: false,
+          message: `Stok tidak mencukupi untuk ${
+            stockResult?.namaBarang || "barang yang dipilih"
+          }`,
+        });
+      }
+
+      // Insert penjualan
+      await query(insertPenjualan, [
+        barangId,
+        jumlahTerjual,
+        totalHarga,
+        totalSetor,
+      ]);
+
+      // Update stok
+      await query(updateStock, [jumlahTerjual, barangId]);
     }
 
+    await connection.commit();
+
     res.status(201).json({
-      message: "Semua barang berhasil ditambahkan",
+      success: true,
+      message: "Transaksi berhasil dilakukan",
     });
   } catch (error) {
-    console.error("Error saat menambahkan barang:", error.message);
+    await connection.rollback();
+    console.error("Error dalam proses checkout:", error);
+
     res.status(500).json({
-      message: "Terjadi kesalahan saat menambahkan barang",
+      success: false,
+      message: "Terjadi kesalahan saat memproses transaksi",
       error: error.message,
     });
+  } finally {
+    connection.release();
   }
 };
 
 export const insertPengeluaran = async (req, res) => {
   const { nominal, keterangan } = req.body;
 
-  const insert = "INSERT INTO pengeluaran (nominal, keterangan, tanggal) VALUES (?, ?, CURDATE())";
+  const insert =
+    "INSERT INTO pengeluaran (nominal, keterangan, tanggal) VALUES (?, ?, CURDATE())";
 
   try {
     await query(insert, [nominal, keterangan]);

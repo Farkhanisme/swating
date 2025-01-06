@@ -84,7 +84,7 @@ const CartTab = () => {
           return null;
         })
         .filter(Boolean);
-
+        
       await axios.post(`${import.meta.env.VITE_API_URL}/checkout`, {
         data: checkoutDetails,
       });
@@ -95,7 +95,7 @@ const CartTab = () => {
       }, 300);
     } catch (error) {
       console.error("Gagal melakukan checkout:", error);
-      alert("Checkout gagal!");
+      toast.error("Checkout gagal!");
     }
   };
 

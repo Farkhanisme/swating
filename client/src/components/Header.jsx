@@ -40,6 +40,11 @@ const Header = () => {
         <Link to="pengeluaran" className="text-xl font-semibold">
           Pengeluaran
         </Link>
+        {pathname && (
+          <Link to="stock" className="text-xl font-semibold">
+            Stock
+          </Link>
+        )}
       </div>
       {!pathname && (
         <div

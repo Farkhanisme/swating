@@ -11,6 +11,7 @@ const PenjualanAdmin = () => {
   const [total, setTotal] = useState([]);
   const [allTotal, setAllTotal] = useState([]);
   const [setor, setSetor] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const getPenjualan = async () => {
@@ -21,6 +22,8 @@ const PenjualanAdmin = () => {
         setPenjualan(response.data);
       } catch (error) {
         alert("Gagal mengambil data");
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -103,15 +106,28 @@ const PenjualanAdmin = () => {
     }
   };
 
+  const handleRefresh = (e) => {
+    e.prevent.default;
+    setIsLoading(true);
+  };
+
   return (
     <>
       <Toaster />
-      <button
-        className="md:w-fit w-full p-2 bg-green-500 rounded-md text-white mb-5"
-        onClick={handleGeneratePDF}
-      >
-        Download Laporan Penjualan
-      </button>
+      <div className="flex md:space-x-5 flex-col md:flex-row">
+        <button
+          className="md:w-fit w-full p-2 bg-green-500 rounded-md text-white mb-5"
+          onClick={handleGeneratePDF}
+        >
+          Download Laporan Penjualan
+        </button>
+        <button
+          className="md:w-fit w-full p-2 bg-green-500 rounded-md text-white mb-5"
+          onClick={handleRefresh}
+        >
+          Refresh
+        </button>
+      </div>
       <div className="flex md:flex-row flex-col md:space-y-0 space-y-5 space-x-0 md:space-x-5 mb-5">
         <div className="flex flex-col md:w-1/2 w-full space-y-2">
           <table className="bg-zinc-100 text-center table-auto">
