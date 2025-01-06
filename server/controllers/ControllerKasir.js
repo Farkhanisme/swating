@@ -152,16 +152,16 @@ export const checkout = async (req, res) => {
       }
 
       // Cek stok
-      const [stockResult] = await query(checkStock, [barangId]);
-      if (!stockResult || stockResult.stock < jumlahTerjual) {
-        await connection.rollback();
-        return res.status(400).json({
-          success: false,
-          message: `Stok tidak mencukupi untuk ${
-            stockResult?.namaBarang || "barang yang dipilih"
-          }`,
-        });
-      }
+      //const [stockResult] = await query(checkStock, [barangId]);
+      //if (!stockResult || stockResult.stock < jumlahTerjual) {
+      //  await connection.rollback();
+      //  return res.status(400).json({
+      //   success: false,
+      //    message: `Stok tidak mencukupi untuk ${
+      //      stockResult?.namaBarang || "barang yang dipilih"
+      //    }`,
+      //  });
+      //}
 
       // Insert penjualan
       await query(insertPenjualan, [
