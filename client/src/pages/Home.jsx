@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { addToCart } from "../store/cart";
+import { formatRupiah } from "../functions/util";
 
 const Home = (props) => {
   const [barang, setBarang] = useState([]);
@@ -143,7 +144,7 @@ const Home = (props) => {
               <td>{barang.namaBarang}</td>
               {/* <td>{barang.kategoriBarang}</td> */}
               <td>{barang.kodeProduk}</td>
-              <td>{barang.hargaJual}</td>
+              <td>{formatRupiah(barang.hargaJual)}</td>
               {/* <td>{barang.stock}</td> */}
               <td>
                 <button
