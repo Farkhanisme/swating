@@ -30,7 +30,7 @@ const CartTab = () => {
         return acc + value;
       }, 0);
       setSum(total);
-    }, 1000);
+    }, 100);
 
     return () => clearInterval(interval);
   }, []);
@@ -107,7 +107,7 @@ const CartTab = () => {
     >
       <Toaster />
       <h2 className="p-5 text-white text-2xl">Cart</h2>
-      <div>
+      <div className="overflow-y-auto">
         {carts.map((item, key) => (
           <CartItem key={key} data={item} />
         ))}

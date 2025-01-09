@@ -103,6 +103,8 @@ const Pengeluaran = () => {
           <label>Nominal: </label>
           <input
             name="nominal"
+            type="text"
+            inputMode="numeric"
             value={formatRupiah(pengeluaran.nominal)}
             onChange={handleChange}
             className="w-full border-2 border-black rounded-md p-1 placeholder-gray-500 text-sm"
