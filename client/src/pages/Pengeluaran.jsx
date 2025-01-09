@@ -96,6 +96,29 @@ const Pengeluaran = () => {
     getPengeluaran();
   }, []);
 
+  const handleDelete = async (id) => {
+    if (!window.confirm("Apakah Anda yakin ingin menghapus barang ini?")) {
+      return;
+    }
+
+    try {
+      const loadingToast = toast.loading("Menghapus barang...");
+
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/admin/delete-pengeluaran/${id}`
+      );
+
+      if (response) {
+        toast.dismiss(loadingToast);
+        toast.success("Barang berhasil dihapus");
+        setIsLoading(true); // Trigger refresh data
+      }
+    } catch (error) {
+      toast.error("Gagal menghapus barang");
+      console.error("Error deleting item:", error);
+    }
+  };
+
   return (
     <>
       <div className="flex md:space-x-5 flex-col md:flex-row md:space-y-0 space-y-5">
@@ -135,6 +158,7 @@ const Pengeluaran = () => {
             <th>Tanggal</th>
             <th>Nominal</th>
             <th>Keterangan</th>
+            <th>Aksi</th>
           </tr>
         </thead>
         <tbody>
@@ -144,11 +168,23 @@ const Pengeluaran = () => {
               className="text-center border border-x-0"
             >
               <td>{index + 1}</td>
-              <td>
-                {moment(dataPengeluaran.tanggal).format("DD MMMM, YYYY")}
-              </td>
+              <td>{moment(dataPengeluaran.tanggal).format("DD MMMM, YYYY")}</td>
               <td>{formatRupiah(dataPengeluaran.nominal)}</td>
               <td>{dataPengeluaran.keterangan}</td>
+              <td className="flex space-x-2">
+                <button
+                  className="bg-red-500 text-white px-2 py-1 rounded text-sm"
+                  onClick={() => handleDelete(dataPengeluaran.id)}
+                >
+                  Hapus
+                </button>
+                <button
+                  className="bg-green-500 text-white px-2 py-1 rounded text-sm"
+                  // onClick={}
+                >
+                  Edit
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

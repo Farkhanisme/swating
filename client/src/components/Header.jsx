@@ -29,8 +29,8 @@ const Header = () => {
     dispatch(toggleStatusTab());
   };
   return (
-    <header className="flex justify-between items-center mb-5 sticky top-0 h-12 bg-zinc-200">
-      <div className="space-x-5">
+    <header className="flex justify-between items-center mb-5 sticky top-0 h-16 bg-zinc-200">
+      <div className="space-x-5 flex flex-wrap">
         <Link to={path} className="text-xl font-semibold">
           Home
         </Link>
@@ -43,6 +43,11 @@ const Header = () => {
         {pathname && (
           <Link to="stock" className="text-xl font-semibold">
             Stock
+          </Link>
+        )}
+        {pathname && (
+          <Link to="riwayat" className="text-xl font-semibold">
+            Riwayat
           </Link>
         )}
       </div>

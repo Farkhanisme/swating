@@ -179,6 +179,7 @@ const PenjualanAdmin = () => {
             <tr>
               <th>Setor</th>
               <th>Penitip</th>
+              <th>Tanggal</th>
             </tr>
           </thead>
           <tbody>
@@ -188,6 +189,7 @@ const PenjualanAdmin = () => {
                   {formatRupiah(setor.totalSetor)}
                 </td>
                 <td className="text-center border border-x-0">{setor.nama}</td>
+                <td className="text-center border border-x-0">{moment(setor.tanggal).format("DD MMMM, YYYY")}</td>
               </tr>
             ))}
           </tbody>

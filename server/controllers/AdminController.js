@@ -167,6 +167,7 @@ export const getSetor = async (req, res) => {
   const select = `SELECT 
     barang.penitipId, 
     penitip.nama,
+    penjualan.tanggal,
     SUM(penjualan.totalHarga) AS totalTerjual, 
     SUM(penjualan.totalSetor) AS totalSetor
 FROM 
@@ -176,7 +177,7 @@ JOIN
 LEFT JOIN
     penitip ON barang.penitipId = penitip.id
 GROUP BY 
-    barang.penitipId;
+    barang.penitipId, penjualan.tanggal;
 `;
   try {
     const result = await query(select);
@@ -240,6 +241,75 @@ export const insertPengeluaran = async (req, res) => {
     res.status(500).json({
       message: "Terjadi kesalahan saat menambahkan data",
       error: error.message,
+    });
+  }
+};
+
+export const deletePengeluaran = async (req, res) => {
+  const { id } = req.params;
+
+  const deletePengeluaran = "DELETE FROM pengeluaran WHERE id = ?";
+  try {
+    const result = await query(deletePengeluaran, [id]);
+
+    res.status(201).json({
+      message: "Pengeluaran berhasil dihapus",
+    });
+  } catch (error) {
+    console.error("Error saat menghapus Pengeluaran:", error.message);
+    res.status(500).json({
+      message: "Terjadi kesalahan saat menghapus Pengeluaran",
+      error: error.message,
+    });
+  }
+};
+
+export const deleteRiwayatPenjualan = async (req, res) => {
+  const { id } = req.params;
+
+  const deleteRiwayatPenjualan = "DELETE FROM penjualan WHERE id = ?";
+  try {
+    const result = await query(deleteRiwayatPenjualan, [id]);
+
+    res.status(201).json({
+      message: "Riwayat Penjualan berhasil dihapus",
+    });
+  } catch (error) {
+    console.error("Error saat menghapus Riwayat Penjualan:", error.message);
+    res.status(500).json({
+      message: "Terjadi kesalahan saat menghapus Riwayat Penjualan",
+      error: error.message,
+    });
+  }
+};
+
+export const getRiwayatPenjualan = async (req, res) => {
+  const select = `
+  SELECT 
+      penjualan.id,
+      barang.namaBarang, 
+      penjualan.tanggal,
+      penitip.nama,
+      barang.stock,
+      penjualan.jumlahTerjual,
+      penjualan.totalHarga
+  FROM 
+      penjualan 
+  JOIN 
+      barang ON penjualan.barangId = barang.id
+  LEFT JOIN 
+      penitip ON barang.penitipId = penitip.id
+  ORDER BY 
+      penjualan.tanggal DESC
+  `;
+  try {
+    const result = await query(select);
+    res.json(result);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return res.status(500).json({
+      error: "Gagal mengambil data",
+      details: error.message,
     });
   }
 };

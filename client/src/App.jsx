@@ -8,6 +8,7 @@ import PenjualanKasir from "./pages/PenjualanKasir";
 import PenjualanAdmin from "./pages/PenjualanAdmin";
 import Pengeluaran from "./pages/Pengeluaran";
 import Stock from "./pages/Stock";
+import RiwayatPenjualan from "./pages/RiwayatPenjualan";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
             <Route path="detail-penjualan" element={<PenjualanAdmin />} />
             <Route path="pengeluaran" element={<Pengeluaran />} />
             <Route path="stock" element={<Stock />} />
+            <Route path="riwayat" element={<RiwayatPenjualan />} />
           </Route>
         </Routes>
       </BrowserRouter>
