@@ -1,15 +1,17 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
-const isDev = process.env.NODE_ENV !== "production";
+const { exec } = require("child_process");
 
+const isDev = process.env.NODE_ENV !== "production";
 let mainWindow;
 
-app.whenReady().then(() => {
+function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1000,
     height: 800,
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: false,
+      contextIsolation: true,
     },
   });
 
@@ -20,6 +22,14 @@ app.whenReady().then(() => {
   mainWindow.loadURL(startURL);
 
   mainWindow.on("closed", () => (mainWindow = null));
+}
+
+app.whenReady().then(() => {
+  if (isDev) {
+    exec("npm run server"); // Otomatis menjalankan backend
+    exec("npm run client"); // Otomatis menjalankan frontend
+  }
+  createWindow();
 });
 
 app.on("window-all-closed", () => {
