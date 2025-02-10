@@ -11,10 +11,7 @@ const PenjualanKasir = () => {
     const getPenjualan = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/get-penjualan`,
-          {
-            params: { kategori },
-          }
+          `${import.meta.env.VITE_API_URL}/admin/get-penjualan-perhari`
         );
         setPenjualan(response.data);
       } catch (error) {
@@ -25,7 +22,7 @@ const PenjualanKasir = () => {
     getPenjualan();
     const getTotal = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/get-total`, {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/admin/get-total-perhari`, {
           params: { kategori },
         });
         setTotal(response.data);
@@ -39,8 +36,8 @@ const PenjualanKasir = () => {
   const totalHarga = penjualan.reduce((acc, curr) => acc + curr.totalHarga, 0);
 
   return (
-    <div className="flex flex-col-reverse md:flex-row">
-      <table className="w-full bg-zinc-100 text-center">
+    <div className="flex flex-col-reverse my-10">
+      <table className="w-full bg-zinc-100 text-center rounded-md shadow-md mt-5">
         <thead>
           <tr>
             <th>No.</th>
@@ -57,7 +54,7 @@ const PenjualanKasir = () => {
             <tr key={index} className="text-center border border-x-0">
               <td>{index + 1}</td>
               <td>
-                {moment(penjualan.tanggal).local().format("DDD MMMM, YYYY")}
+                {moment(penjualan.tanggal).format('DD MMMM, YYYY')}
               </td>
               <td>{penjualan.namaBarang}</td>
               <td>{penjualan.totalTerjual}</td>
@@ -68,7 +65,8 @@ const PenjualanKasir = () => {
           ))}
         </tbody>
       </table>
-      <table className="md:w-2/6 w-full bg-zinc-100 text-center">
+      
+      <table className="md:w-2/6 w-full bg-zinc-100 text-center rounded-md shadow-md">
         <thead>
           <tr>
             {/* <th>No.</th> */}
@@ -80,7 +78,7 @@ const PenjualanKasir = () => {
           {total.map((total, index) => (
             <tr key={index}>
               {/* <td>{index + 1}</td> */}
-              <td>{moment(total.tanggal).format("DDD MMMM, YYYY")}</td>
+              <td>{moment(total.tanggal).format("DD MMMM, YYYY")}</td>
               <td>{formatRupiah(total.totalTerjual)}</td>
             </tr>
           ))}

@@ -28,19 +28,21 @@ const CartItem = (props) => {
   }, [barang, productId]);
   
   const handleMinusQuantity = () => {
+    const minus = detail.namaBarang.toLowerCase().includes("garangan") ? 0.25 : 1;;
     dispatch(
       changeQuantity({
         productId: productId,
-        quantity: quantity - 1,
+        quantity: quantity - minus,
       })
     );
   };
 
   const handlePlusQuantity = () => {
+    const plus = detail.namaBarang.toLowerCase().includes("garangan") ? 0.25 : 1;;
     dispatch(
       changeQuantity({
         productId: productId,
-        quantity: quantity + 1,
+        quantity: quantity + plus,
       })
     );
   };

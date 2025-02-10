@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CartItem from "./CartItem";
-import { toggleStatusTab } from "../store/cart";
+import { handleEmpty, toggleStatusTab } from "../store/cart";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import { formatRupiah } from "../functions/util";
 
 const CartTab = () => {
   const carts = useSelector((store) => store.cart.items);
@@ -12,11 +13,12 @@ const CartTab = () => {
   const dispatch = useDispatch();
   const [barang, setBarang] = useState([]);
   const [sum, setSum] = useState(0);
+  const [tanggal, setTanggal] = useState(new Date().toISOString().split("T")[0])
 
   const navigate = useNavigate();
 
-  const handleCloseTab = () => {
-    dispatch(toggleStatusTab());
+  const handleClear = () => {
+    dispatch(handleEmpty());
   };
 
   useEffect(() => {
@@ -34,21 +36,6 @@ const CartTab = () => {
 
     return () => clearInterval(interval);
   }, []);
-
-  const formatRupiah = (angka) => {
-    let number_string = angka.toString().replace(/[^,\d]/g, ""),
-      split = number_string.split(","),
-      sisa = split[0].length % 3,
-      rupiah = split[0].substr(0, sisa),
-      ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
-    if (ribuan) {
-      let separator = sisa ? "." : "";
-      rupiah += separator + ribuan.join(".");
-    }
-
-    return "Rp. " + rupiah;
-  };
 
   useEffect(() => {
     const getBarang = async () => {
@@ -77,36 +64,36 @@ const CartTab = () => {
             return {
               barangId: product.id,
               jumlahTerjual: cartItem.quantity,
-              totalHarga: product.hargaJual * cartItem.quantity,
-              totalSetor: product.hargaAwal * cartItem.quantity,
+              tanggal: tanggal,
             };
           }
           return null;
         })
         .filter(Boolean);
-        
-      await axios.post(`${import.meta.env.VITE_API_URL}/checkout`, {
+
+      await axios.post(`${import.meta.env.VITE_API_URL}/admin/checkout`, {
         data: checkoutDetails,
       });
 
       toast.success("Checkout berhasil!");
-      setTimeout(() => {
-        navigate(0);
-      }, 300);
+      handleClear();
     } catch (error) {
       console.error("Gagal melakukan checkout:", error);
       toast.error("Checkout gagal!");
     }
   };
 
+  const handleDate = (e) => {
+    setTanggal(e);
+  }
+
   return (
     <div
-      className={`fixed top-0 right-0 bg-gray-700 shadow-2xl md:w-96 w-full h-full grid grid-rows-[60px_1fr_112px] transform transition-transform duration-500 ${
-        statusTab === false ? "translate-x-full" : ""
-      }`}
+      className={`top-0 right-0 bg-gray-700 w-1/3 grid grid-rows-[60px_60px_1fr_112px]`}
     >
       <Toaster />
-      <h2 className="p-5 text-white text-2xl">Cart</h2>
+      <h2 className="p-5 text-white text-2xl text-center shadow-md">SWATING</h2>
+      <input type="date" name="tanggal" id="tanggal" className="bg-transparent w-full h-5 mx-auto p-5 text-gray-100" value={tanggal} onChange={(e) => handleDate(e.target.value)} />
       <div className="overflow-y-auto">
         {carts.map((item, key) => (
           <CartItem key={key} data={item} />
@@ -119,9 +106,9 @@ const CartTab = () => {
         <div>
           <button
             className="bg-black text-white w-1/2 h-14"
-            onClick={handleCloseTab}
+            onClick={handleClear}
           >
-            CLOSE
+            CLEAR
           </button>
           <button
             className="bg-amber-600 text-white w-1/2 h-14"

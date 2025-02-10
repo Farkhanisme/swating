@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   items: [],
-  statusTab:false
+  statusTab: false,
 };
 
 const cartSlice = createSlice({
@@ -16,10 +16,9 @@ const cartSlice = createSlice({
       );
       if (indexProductId >= 0) {
         state.items[indexProductId].quantity += quantity;
-        
-    } else {
+      } else {
         state.items.push({ productId, quantity });
-    }
+      }
     },
     changeQuantity(state, action) {
       const { productId, quantity } = action.payload;
@@ -34,15 +33,18 @@ const cartSlice = createSlice({
         );
       }
     },
-    toggleStatusTab(state){
-        if (state.statusTab === false) {
-            state.statusTab = true
-        } else {
-            state.statusTab = false
-        }
-    }
+    toggleStatusTab(state) {
+      if (state.statusTab === false) {
+        state.statusTab = true;
+      } else {
+        state.statusTab = false;
+      }
+    },
+    handleEmpty(state) {
+      state.items = [];
+    },
   },
 });
 
-export const { addToCart, changeQuantity, toggleStatusTab } = cartSlice.actions;
+export const { addToCart, changeQuantity, toggleStatusTab, handleEmpty } = cartSlice.actions;
 export default cartSlice.reducer;

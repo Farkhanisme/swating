@@ -7,8 +7,12 @@ import Admin from "./components/Admin";
 import PenjualanKasir from "./pages/PenjualanKasir";
 import PenjualanAdmin from "./pages/PenjualanAdmin";
 import Pengeluaran from "./pages/Pengeluaran";
+import ReStock from "./pages/ReStock";
 import Stock from "./pages/Stock";
 import RiwayatPenjualan from "./pages/RiwayatPenjualan";
+import Setor from "./pages/Setor";
+import DataSetor from "./pages/DataSetor";
+import PenjualanLain from "./pages/PenjualanLain";
 
 function App() {
   return (
@@ -17,16 +21,20 @@ function App() {
         <Routes>
           <Route path="/" element={<Kasir />}>
             <Route index element={<Home />} />
-            <Route path="detail-penjualan" element={<PenjualanKasir />} />
-            <Route path="pengeluaran" element={<Pengeluaran />} />
-          </Route>
-          <Route path="/admin" element={<Admin />}>
-            <Route index element={<TambahBarang />} />
-            <Route path="kasir" element={<Home />} />
+            <Route path="tambah-barang" element={<TambahBarang />} />
             <Route path="detail-penjualan" element={<PenjualanAdmin />} />
+            <Route
+              path="detail-penjualan-perhari"
+              element={<PenjualanKasir />}
+            />
             <Route path="pengeluaran" element={<Pengeluaran />} />
-            <Route path="stock" element={<Stock />} />
             <Route path="riwayat" element={<RiwayatPenjualan />} />
+            <Route path="setor" element={<Setor />} />
+            <Route path="data-setor" element={<DataSetor />} />
+            {/* <Route path="stock" element={<ReStock />} /> */}
+            <Route path="stock" element={<Stock />} />
+            <Route path="restock" element={<ReStock />} />
+            <Route path="penjualan-lain" element={<PenjualanLain />} />
           </Route>
         </Routes>
       </BrowserRouter>

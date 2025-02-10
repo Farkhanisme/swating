@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { Toaster } from "react-hot-toast";
@@ -10,12 +10,17 @@ import { formatRupiah } from "../functions/util";
 const Home = (props) => {
   const [barang, setBarang] = useState([]);
   const [kategori, setKategori] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
   useEffect(() => {
     const getBarang = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/get-barang`, {
-          params: { kategori },
-        });
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/admin/get-barang`,
+          {
+            params: { kategori },
+          }
+        );
         setBarang(response.data);
       } catch (error) {
         toast.error("Gagal mengambil data");
@@ -44,44 +49,78 @@ const Home = (props) => {
       case "minuman":
         setKategori("minuman");
         break;
+      case "lain-lain":
+        setKategori("lain-lain");
+        break;
       default:
-        setKategori("");
+        setKategori(""); // All categories
         break;
     }
   };
 
-  
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value.toLowerCase());
+  };
+
+  const filteredBarang = barang.filter((item) => {
+    // Filter berdasarkan kategori dan pencarian
+    const kategoriMatch = item.kategoriBarang
+      .toLowerCase()
+      .includes(kategori.toLowerCase());
+    const searchMatch = item.namaBarang.toLowerCase().includes(searchQuery);
+
+    return kategoriMatch && searchMatch; // Pastikan keduanya cocok
+  });
+
   const carts = useSelector((store) => store.cart.items);
   const dispatch = useDispatch();
 
   const handleAddToCart = (productId) => {
+    const product = filteredBarang.find((item) => item.id === productId);
+    if (!product) return;
+
+    const quantity =
+      product.namaBarang.toLowerCase().includes("garangan")
+        ? 0.25
+        : 1;
     dispatch(
       addToCart({
         productId: productId,
-        quantity: 1,
+        quantity: quantity,
       })
     );
+    toast.success("Barang berhasil ditambahkan")
   };
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const inputRef = useRef(null);
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value.toLowerCase());
+  const delSearch = () => {
+    setSearchQuery("");
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
   };
 
-  const filteredBarang = barang.filter((item) =>
-    item.namaBarang.toLowerCase().includes(searchTerm)
-  );
   return (
     <div>
       <Toaster />
       <h1 className="text-3xl my-5 text-center">Data Barang</h1>
-      <input
-      type="text"
-      placeholder="Cari barang..."
-      className="border p-2 mb-4 rounded"
-      onChange={handleSearch}
-    />
+      <div className="flex space-x-5">
+        <input
+          ref={inputRef}
+          type="text"
+          placeholder="Cari barang..."
+          className="border p-2 mb-4 rounded w-full"
+          value={searchQuery}
+          onChange={handleSearch}
+        />
+        <button
+          onClick={delSearch}
+          className="bg-red-500 h-10 w-10 text-white rounded mr-2"
+        >
+          x
+        </button>
+      </div>
       <div className="flex gap-3 justify-around mb-5 flex-wrap">
         <button
           className="bg-green-500 rounded-sm text-white md:p-2 p-1"
@@ -124,8 +163,15 @@ const Home = (props) => {
         >
           Minuman
         </button>
+        <button
+          className="bg-green-500 rounded-sm text-white md:p-2 p-1"
+          name="lain-lain"
+          onClick={handleClick}
+        >
+          Lain-lain
+        </button>
       </div>
-      <table className="w-full bg-zinc-100">
+      <table className="w-full bg-zinc-100 rounded-md shadow-md">
         <thead>
           <tr>
             <th>No.</th>
@@ -148,7 +194,7 @@ const Home = (props) => {
               {/* <td>{barang.stock}</td> */}
               <td>
                 <button
-                  className="bg-green-500 p-3 rounded-sm text-white"
+                  className="bg-green-500 p-3 m-1 rounded-sm text-white"
                   onClick={() => handleAddToCart(barang.id)}
                 >
                   <svg

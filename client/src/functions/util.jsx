@@ -1,4 +1,8 @@
 export const formatRupiah = (angka) => {
+  if (angka == null || angka === undefined) {
+    return;
+  }
+
   let number_string = angka.toString().replace(/[^,\d]/g, ""),
     split = number_string.split(","),
     sisa = split[0].length % 3,

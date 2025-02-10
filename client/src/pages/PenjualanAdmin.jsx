@@ -5,6 +5,7 @@ import { formatRupiah } from "../functions/util";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import toast, { Toaster } from "react-hot-toast";
+import ExportExcel from "../components/ExportExcel";
 
 const PenjualanAdmin = () => {
   const [penjualan, setPenjualan] = useState([]);
@@ -21,7 +22,7 @@ const PenjualanAdmin = () => {
         );
         setPenjualan(response.data);
       } catch (error) {
-        alert("Gagal mengambil data");
+        toast.error("Gagal mengambil data");
       } finally {
         setIsLoading(false);
       }
@@ -35,7 +36,7 @@ const PenjualanAdmin = () => {
         );
         setTotal(response.data);
       } catch (error) {
-        alert("Gagal mengambil data");
+        toast.error("Gagal mengambil data");
       }
     };
     getTotal();
@@ -47,7 +48,7 @@ const PenjualanAdmin = () => {
         );
         setAllTotal(response.data);
       } catch (error) {
-        alert("Gagal mengambil data");
+        toast.error("Gagal mengambil data");
       }
     };
     getAllTotal();
@@ -59,7 +60,7 @@ const PenjualanAdmin = () => {
         );
         setSetor(response.data);
       } catch (error) {
-        alert("Gagal mengambil data");
+        toast.error("Gagal mengambil data");
       }
     };
     getSetor();
@@ -111,10 +112,38 @@ const PenjualanAdmin = () => {
     setIsLoading(true);
   };
 
+  const groupedPenjualan = penjualan.reduce((acc, item) => {
+    const tanggal = moment(item.tanggal).format("YYYY-MM-DD");
+
+    if (!acc[tanggal]) {
+      acc[tanggal] = [];
+    }
+
+    acc[tanggal].push(item);
+
+    return acc;
+  }, {});
+
+  const groupedSetor = setor.reduce((acc, item) => {
+    const tanggal = moment(item.tanggal).format("YYYY-MM-DD");
+
+    if (!acc[tanggal]) {
+      acc[tanggal] = [];
+    }
+
+    acc[tanggal].push(item);
+
+    return acc;
+  }, {});
+
+  // Konversi objek hasil reduce menjadi array
+  const groupedArray = Object.values(groupedPenjualan);
+  const groupedArraySetor = Object.values(groupedSetor);
+
   return (
-    <>
+    <div className="h-full">
       <Toaster />
-      <div className="flex md:space-x-5 flex-col md:flex-row">
+      <div className="flex space-x-5 flex-row">
         <button
           className="md:w-fit w-full p-2 bg-green-500 rounded-md text-white mb-5"
           onClick={handleGeneratePDF}
@@ -127,12 +156,14 @@ const PenjualanAdmin = () => {
         >
           Refresh
         </button>
+        <ExportExcel data={penjualan} />
       </div>
-      <div className="flex md:flex-row flex-col md:space-y-0 space-y-5 space-x-0 md:space-x-5 mb-5">
-        <div className="flex flex-col md:w-1/2 w-full space-y-2">
-          <table className="bg-zinc-100 text-center table-auto">
+      <div className="flex flex-row space-x-5 mb-5 h-2/5">
+        <div className="flex flex-col w-1/2 overflow-x-scroll space-y-2 rounded-md shadow-md">
+          <table className="bg-zinc-100 text-center table-auto rounded-md shadow-md">
             <thead>
               <tr>
+                <th>Bulan</th>
                 <th>Pendapatan</th>
                 <th>Setor</th>
                 <th>Laba</th>
@@ -141,6 +172,9 @@ const PenjualanAdmin = () => {
             <tbody>
               {allTotal.map((allTotal, index) => (
                 <tr key={index}>
+                  <td className="text-center border border-x-0">
+                    {moment(allTotal.bulan).format("MMMM YYYY")}
+                  </td>
                   <td className="text-center border border-x-0">
                     {formatRupiah(allTotal.totalTerjual)}
                   </td>
@@ -154,78 +188,115 @@ const PenjualanAdmin = () => {
               ))}
             </tbody>
           </table>
-
-          <table className="bg-zinc-100 text-center">
+          <table className="bg-zinc-100 text-center rounded-md shadow-md">
             <thead>
               <tr>
                 <th>No.</th>
                 <th>Tanggal</th>
                 <th>Total</th>
+                <th>Total Setor</th>
+                <th>Laba</th>
               </tr>
             </thead>
             <tbody>
               {total.map((total, index) => (
                 <tr key={index} className="text-center border border-x-0">
                   <td>{index + 1}</td>
-                  <td>{moment(total.tanggal).format("DDD MMMM, YYYY")}</td>
-                  <td>{formatRupiah(total.totalTerjual)}</td>
+                  <td>{moment(total.tanggal).format("DD MMMM, YYYY")}</td>
+                  <td className="text-left">
+                    {formatRupiah(total.totalTerjual)}
+                  </td>
+                  <td className="text-left">
+                    {formatRupiah(total.totalSetor)}
+                  </td>
+                  <td className="text-left">
+                    {formatRupiah(total.totalTerjual - total.totalSetor)}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <table className="bg-zinc-100 text-center md:w-1/2 table-auto">
-          <thead>
-            <tr>
-              <th>Setor</th>
-              <th>Penitip</th>
-              <th>Tanggal</th>
-            </tr>
-          </thead>
+        <div className="overflow-x-scroll w-1/2 rounded-md shadow-md">
+          <table className="bg-zinc-100 text-center w-full table-auto rounded-md shadow-md">
+            <tbody>
+              {groupedArraySetor.map((group, groupIndex) => (
+                <React.Fragment key={groupIndex}>
+                  {/* Menampilkan tanggal grup */}
+                  <tr className="bg-gray-200 font-semibold text-xl">
+                    <td colSpan="7" className="p-2">
+                      {moment(group[0].tanggal).format("DD MMMM, YYYY")}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Setor</th>
+                    <th>Penitip</th>
+                    <th>Tanggal</th>
+                  </tr>
+
+                  {/* Menampilkan data setiap penjualan dalam grup */}
+                  {group.map((setor, index) => (
+                    <tr key={index}>
+                      <td className="text-center border border-x-0">
+                        {formatRupiah(setor.totalSetor)}
+                      </td>
+                      <td className="text-center border border-x-0">
+                        {setor.nama}
+                      </td>
+                      <td className="text-center border border-x-0">
+                        {moment(setor.tanggal).format("DD MMMM, YYYY")}
+                      </td>
+                    </tr>
+                  ))}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className="h-[45%] overflow-x-scroll rounded-md shadow-md">
+        <table className="w-full bg-zinc-100 text-center rounded-md shadow-md">
           <tbody>
-            {setor.map((setor, index) => (
-              <tr key={index}>
-                <td className="text-center border border-x-0">
-                  {formatRupiah(setor.totalSetor)}
-                </td>
-                <td className="text-center border border-x-0">{setor.nama}</td>
-                <td className="text-center border border-x-0">{moment(setor.tanggal).format("DD MMMM, YYYY")}</td>
-              </tr>
+            {groupedArray.map((group, groupIndex) => (
+              <React.Fragment key={groupIndex}>
+                {/* Menampilkan tanggal grup */}
+                <tr className="bg-gray-200 font-semibold text-xl">
+                  <td colSpan="7" className="p-2">
+                    {moment(group[0].tanggal).format("DD MMMM, YYYY")}
+                  </td>
+                </tr>
+                <tr>
+                  <th>No.</th>
+                  <th>Tanggal</th>
+                  <th>Nama Barang</th>
+                  <th>Qty</th>
+                  <th>Sisa</th>
+                  <th>Harga</th>
+                  <th>Penitip</th>
+                </tr>
+
+                {/* Menampilkan data setiap penjualan dalam grup */}
+                {group.map((penjualan, index) => (
+                  <tr key={index} className="text-center border border-x-0">
+                    <td>{index + 1}</td>
+                    <td>
+                      {moment(penjualan.tanggal)
+                        .local()
+                        .format("DD MMMM, YYYY")}
+                    </td>
+                    <td>{penjualan.namaBarang}</td>
+                    <td>{penjualan.totalTerjual}</td>
+                    <td>{penjualan.stock != null ? penjualan.stock : "♾️"}</td>
+                    <td>{formatRupiah(penjualan.totalHarga)}</td>
+                    <td>{penjualan.penitip}</td>
+                  </tr>
+                ))}
+              </React.Fragment>
             ))}
           </tbody>
         </table>
       </div>
-      <div className="flex flex-col-reverse md:flex-row">
-        <table className="w-full bg-zinc-100 text-center">
-          <thead>
-            <tr>
-              <th>No.</th>
-              <th>Tanggal</th>
-              <th>Nama Barang</th>
-              <th>Qty</th>
-              <th>Sisa</th>
-              <th>Harga</th>
-              <th>Penitip</th>
-            </tr>
-          </thead>
-          <tbody>
-            {penjualan.map((penjualan, index) => (
-              <tr key={index} className="text-center border border-x-0">
-                <td>{index + 1}</td>
-                <td>
-                  {moment(penjualan.tanggal).local().format("DDD MMMM, YYYY")}
-                </td>
-                <td>{penjualan.namaBarang}</td>
-                <td>{penjualan.totalTerjual}</td>
-                <td>{penjualan.stock != null ? penjualan.stock : "♾️"}</td>
-                <td>{formatRupiah(penjualan.totalHarga)}</td>
-                <td>{penjualan.nama}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
+    </div>
   );
 };
 

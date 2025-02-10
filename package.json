@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\" \"npm run electron\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "electron": "electron main.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "electron": "^34.0.2",
+    "electron-builder": "^25.1.8",
+    "nodemon": "^3.1.9",
+    "wait-on": "^8.0.2"
+  }
+}

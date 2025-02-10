@@ -1,109 +1,132 @@
 import axios from "axios";
-import moment from "moment";
-import React, { useEffect, useState } from "react";
-import { formatRupiah } from "../functions/util";
-import toast, { Toaster } from "react-hot-toast";
+import React, { useEffect, useState, useRef } from "react";
 
-const Stock = () => {
-  const [penjualan, setPenjualan] = useState([]);
+const StokBarang = () => {
+  const [stokData, setStokData] = useState([]);
+  const [terjualData, setTerjualData] = useState([]);
+  const stokTableRef = useRef(null);
+  const terjualTableRef = useRef(null);
+
   useEffect(() => {
     const getPenjualan = async () => {
       try {
         const response = await axios.get(
           `${import.meta.env.VITE_API_URL}/admin/get-stock`
         );
-        setPenjualan(response.data);
+        setStokData(response.data.stok);
+        setTerjualData(response.data.terjual);
       } catch (error) {
-        alert("Gagal mengambil data");
+        alert(error);
       }
     };
     getPenjualan();
   }, []);
 
-  const updateStock = async (id, newStock) => {
-    try {
-      console.log(id, newStock);
-      const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/admin/update-stock`,
-        { id, stock: newStock }
-      );
+  if (stokData.length === 0 || terjualData.length === 0)
+    return <p className="text-center mt-5">Loading...</p>;
 
-      
-      toast.success(response.data.message);
+  const stokColumns = Object.keys(stokData[0]);
+  const terjualColumns = Object.keys(terjualData[0]);
 
-      // Memperbarui data lokal setelah update
-      setPenjualan((prev) =>
-        prev.map((item) =>
-          item.id === id
-            ? { ...item, stock: newStock, updated_at: new Date() }
-            : item
-        )
-      );
-    } catch (error) {
-      toast.error("Gagal memperbarui stok");
-      console.error(error.message);
-    }
+  console.log(terjualColumns);
+  
+
+  // Fungsi untuk sinkronisasi scroll
+  const syncScroll = (e, ref) => {
+    if (ref.current) ref.current.scrollLeft = e.target.scrollLeft;
   };
 
   return (
-    <div className="overflow-y-auto">
-      <Toaster />
-      <table className="w-full bg-zinc-100 text-center">
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>Re-Stock</th>
-            <th>Nama Barang</th>
-            <th>Qty</th>
-            <th>Stock</th>
-            <th>Harga</th>
-            <th>Penitip</th>
-            <th>Re-Stock</th>
-          </tr>
-        </thead>
-        <tbody>
-          {penjualan.map((penjualan, index) => (
-            <tr key={index} className="text-center border border-x-0">
-              <td>{index + 1}</td>
-              <td>
-                {moment(penjualan.updated_at).local().format("DD MMMM, YYYY")}
-              </td>
-              <td>{penjualan.namaBarang}</td>
-              <td>{penjualan.totalTerjual}</td>
-              <td>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  defaultValue={penjualan.stock}
-                  className="border p-1 w-10 text-center"
-                  onChange={(e) => {
-                    const value = parseInt(e.target.value, 10);
-                    setPenjualan((prev) =>
-                      prev.map((item) =>
-                        item.id === penjualan.id
-                          ? { ...item, stock: value }
-                          : item
-                      )
-                    );
-                  }}
-                />
-              </td>
-              <td>{formatRupiah(penjualan.totalHarga)}</td>
-              <td>{penjualan.nama}</td>
-              <td>
-                <button
-                  className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                  onClick={() => updateStock(penjualan.id, penjualan.stock)}
-                >
-                  Update
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="w-full overflow-hidden">
+      <div className="flex space-x-4">
+        {/* Tabel Stok */}
+        <div
+          className="overflow-x-auto w-1/2"
+          ref={stokTableRef}
+          onScroll={(e) => syncScroll(e, terjualTableRef)}
+        >
+          <h2 className="text-lg font-semibold text-center my-2">
+            Stok Barang
+          </h2>
+          <table className="min-w-max border-collapse border border-gray-300">
+            <thead>
+              <tr className="bg-gray-200 text-gray-700">
+                {stokColumns.map((col, index) => (
+                  <th
+                    key={col}
+                    className={`p-2 border border-gray-300 ${
+                      index === 0 ? "sticky left-0 bg-white" : ""
+                    }`}
+                  >
+                    {col === "namaBarang" ? "Nama Barang" : col}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {stokData.map((row, index) => (
+                <tr key={index} className="odd:bg-gray-100">
+                  {stokColumns.map((col, colIndex) => (
+                    <td
+                      key={col}
+                      className={`p-2 border border-gray-300 text-center ${
+                        colIndex === 0 ? "sticky left-0 bg-white" : ""
+                      }`}
+                    >
+                      {row[col] || 0}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Tabel Terjual */}
+        <div
+          className="overflow-x-auto w-1/2"
+          ref={terjualTableRef}
+          onScroll={(e) => syncScroll(e, stokTableRef)}
+        >
+          <h2 className="text-lg font-semibold text-center my-2">
+            Barang Terjual
+          </h2>
+          <table className="min-w-max border-collapse border border-gray-300">
+            <thead>
+              <tr className="bg-gray-200 text-gray-700">
+                {terjualColumns.map((col, index) => (
+                  <th
+                    key={col}
+                    className={`p-2 border border-gray-300 ${
+                      index === 0 ? "sticky left-0 bg-white" : ""
+                    }`}
+                  >
+                    {col === "barang_id" ? "ID Barang" : col}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {terjualData.map((row, index) => (
+                <tr key={index} className="odd:bg-gray-100">
+                  {terjualColumns.map((col, colIndex) => (
+                    <td
+                      key={col}
+                      className={`p-2 border border-gray-300 text-center ${
+                        colIndex === 0 ? "sticky left-0 bg-white" : ""
+                      }`}
+                    >
+                      {row[col] || 0}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Stock;
+export default StokBarang;
